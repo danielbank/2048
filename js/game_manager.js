@@ -65,7 +65,7 @@ GameManager.prototype.setup = function () {
 // Set up the initial tiles to start the game with
 GameManager.prototype.addStartTiles = function () {
   var redPiece = new Tile(this.grid.randomAvailableCell(), 'Red');
-  var bluePiece = new Tile(this.grid.randomAvailableCell(), 'Blue');
+  var bluePiece = new Tile(this.grid.randomAvailableCell(), 'Blu');
   this.grid.insertTile(redPiece);
   this.grid.insertTile(bluePiece);
   for (var i = 0; i < this.startTiles; i++) {
