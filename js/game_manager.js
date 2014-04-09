@@ -176,6 +176,19 @@ GameManager.prototype.move = function (direction) {
 
           // The mighty 2048 tile
           if (merged.value === 2048) self.won = true;
+        } else if (next && ((next.value === 'Blu' && tile.value === 'Red') || (next.value === 'Red' && tile.value === 'Blu')) && !next.mergedFrom){
+          var merged = new Tile(positions.next, tile.value);
+          merged.mergedFrom = [tile, next];
+
+          self.grid.insertTile(merged);
+          self.grid.removeTile(tile);
+
+          // Converge the two tiles' positions
+          tile.updatePosition(positions.next);
+
+          // Update the score
+          self.score += 5000;
+          self.won = true;
         } else {
           self.moveTile(tile, positions.farthest);
         }
