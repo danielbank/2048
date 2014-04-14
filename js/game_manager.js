@@ -64,10 +64,13 @@ GameManager.prototype.setup = function () {
 
 // Set up the initial tiles to start the game with
 GameManager.prototype.addStartTiles = function () {
-  var redPiece = new Tile(this.grid.randomAvailableCell(), 'Red');
-  var bluePiece = new Tile(this.grid.randomAvailableCell(), 'Blu');
-  this.grid.insertTile(redPiece);
-  this.grid.insertTile(bluePiece);
+  // TODO: Decide the tile representation
+  var whitePiece = new Tile(this.grid.randomAvailableCell(), '♔');
+  //var whitePiece = new Tile(this.grid.randomAvailableCell(), '♔♕');
+  var blackPiece = new Tile(this.grid.randomAvailableCell(), '♚');
+  //var blackPiece = new Tile(this.grid.randomAvailableCell(), '♚♛');
+  this.grid.insertTile(whitePiece);
+  this.grid.insertTile(blackPiece);
   for (var i = 0; i < this.startTiles; i++) {
     this.addRandomTile();
   }
@@ -176,7 +179,7 @@ GameManager.prototype.move = function (direction) {
 
           // The mighty 2048 tile
           if (merged.value === 2048) self.won = true;
-        } else if (next && ((next.value === 'Blu' && tile.value === 'Red') || (next.value === 'Red' && tile.value === 'Blu')) && !next.mergedFrom){
+        } else if (next && ((next.value === '♚' && tile.value === '♔') || (next.value === '♔' && tile.value === '♚')) && !next.mergedFrom){
           var merged = new Tile(positions.next, tile.value);
           merged.mergedFrom = [tile, next];
 
