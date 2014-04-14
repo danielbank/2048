@@ -64,7 +64,7 @@ h1.title {
   text-align: right;
 }
 
-.score-container, .best-container {
+.white-score-container, .black-score-container {
   $height: 25px;
 
   position: relative;
@@ -106,12 +106,12 @@ h1.title {
   }
 }
 
-.score-container:after {
-  content: "Score";
+.white-score-container:after {
+  content: "White";
 }
 
-.best-container:after {
-  content: "Best"
+.black-score-container:after {
+  content: "Black"
 }
 
 p {
@@ -492,7 +492,7 @@ hr {
     margin: 0 auto;
   }
 
-  .score-container, .best-container {
+  .white-score-container, .black-score-container {
     margin-top: 0;
     padding: 15px 10px;
     min-width: 40px;

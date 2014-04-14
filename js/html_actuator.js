@@ -1,10 +1,11 @@
 function HTMLActuator() {
   this.tileContainer    = document.querySelector(".tile-container");
-  this.scoreContainer   = document.querySelector(".score-container");
-  this.bestContainer    = document.querySelector(".best-container");
+  this.whiteScoreContainer   = document.querySelector(".white-score-container");
+  this.blackScoreContainer   = document.querySelector(".black-score-container");
   this.messageContainer = document.querySelector(".game-message");
 
-  this.score = 0;
+  this.whiteScore = 0;
+  this.blackScore = 0;
 }
 
 HTMLActuator.prototype.actuate = function (grid, metadata) {
@@ -21,21 +22,21 @@ HTMLActuator.prototype.actuate = function (grid, metadata) {
       });
     });
 
-    self.updateScore(metadata.score);
-    self.updateBestScore(metadata.bestScore);
+    self.updateScore("white", metadata.whiteScore);
+    self.updateScore("black", metadata.blackScore);
 
     if (metadata.terminated) {
-      if (metadata.over) {
-        self.message(false); // You lose
-      } else if (metadata.won) {
-        self.message(true); // You win!
+      if (metadata.whiteWon) {
+        self.message(true); // White wins! 
+      } else if (metadata.blackWon) {
+        self.message(false); // Black wins!
       }
     }
 
   });
 };
 
-// Continues the game)
+// Continues the game
 HTMLActuator.prototype.continueGame = function () {
   this.clearMessage();
 };
@@ -103,30 +104,43 @@ HTMLActuator.prototype.positionClass = function (position) {
   return "tile-position-" + position.x + "-" + position.y;
 };
 
-HTMLActuator.prototype.updateScore = function (score) {
-  this.clearContainer(this.scoreContainer);
+HTMLActuator.prototype.updateScore = function (team, score) {
+  if(team === "white"){
+    this.clearContainer(this.whiteScoreContainer);
+  } else {
+    this.clearContainer(this.blackScoreContainer);
+  }
 
-  var difference = score - this.score;
-  this.score = score;
+  if(team === "white"){
+    var difference = score - this.whiteScore;
+    this.whiteScore = score;
+  } else {
+    var difference = score - this.blackScore;
+    this.blackScore = score;
+  }
 
-  this.scoreContainer.textContent = this.score;
+  if(team === "white"){
+    this.whiteScoreContainer.textContent = this.whiteScore;
+  } else {
+    this.blackScoreContainer.textContent = this.blackScore;
+  }
 
   if (difference > 0) {
     var addition = document.createElement("div");
     addition.classList.add("score-addition");
     addition.textContent = "+" + difference;
 
-    this.scoreContainer.appendChild(addition);
+    if(team === "white"){
+      this.whiteScoreContainer.appendChild(addition);
+    } else {
+      this.blackScoreContainer.appendChild(addition);
+    }
   }
 };
 
-HTMLActuator.prototype.updateBestScore = function (bestScore) {
-  this.bestContainer.textContent = bestScore;
-};
-
 HTMLActuator.prototype.message = function (won) {
-  var type    = won ? "game-won" : "game-over";
-  var message = won ? "You win!" : "Game over!";
+  var type    = "game-won";
+  var message = won ? "White wins!" : "Black wins!";
 
   this.messageContainer.classList.add(type);
   this.messageContainer.getElementsByTagName("p")[0].textContent = message;
@@ -135,5 +149,4 @@ HTMLActuator.prototype.message = function (won) {
 HTMLActuator.prototype.clearMessage = function () {
   // IE only takes one value to remove at a time.
   this.messageContainer.classList.remove("game-won");
-  this.messageContainer.classList.remove("game-over");
 };

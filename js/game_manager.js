@@ -21,7 +21,7 @@ GameManager.prototype.restart = function () {
 
 // Return true if the game is lost, or has won and the user hasn't kept playing
 GameManager.prototype.isGameTerminated = function () {
-  if (this.over || this.won) {
+  if (this.whiteWon || this.blackWon) {
     return true;
   } else {
     return false;
@@ -36,14 +36,17 @@ GameManager.prototype.setup = function () {
   if (previousState) {
     this.grid        = new Grid(previousState.grid.size,
                                 previousState.grid.cells); // Reload grid
-    this.score       = previousState.score;
-    this.over        = previousState.over;
-    this.won         = previousState.won;
+    this.whitesTurn      = true;
+    this.whiteScore       = previousState.whiteScore;
+    this.blackScore       = previousState.blackScore;
+    this.whiteWon         = previousState.whiteWon;
+    this.blackWon         = previousState.blackWon;
   } else {
     this.grid        = new Grid(this.size);
-    this.score       = 0;
-    this.over        = false;
-    this.won         = false;
+    this.whiteScore       = 0;
+    this.blackScore       = 0;
+    this.whiteWon         = false;
+    this.blackWon         = false;
 
     // Add the initial tiles
     this.addStartTiles();
@@ -79,22 +82,19 @@ GameManager.prototype.addRandomTile = function () {
 
 // Sends the updated grid to the actuator
 GameManager.prototype.actuate = function () {
-  if (this.storageManager.getBestScore() < this.score) {
-    this.storageManager.setBestScore(this.score);
-  }
-
-  // Clear the state when the game is over (game over only, not win)
-  if (this.over) {
+  // Clear the state when the game is over
+  if (this.whiteWon || this.blackWon) {
     this.storageManager.clearGameState();
   } else {
     this.storageManager.setGameState(this.serialize());
   }
 
   this.actuator.actuate(this.grid, {
-    score:      this.score,
-    over:       this.over,
-    won:        this.won,
-    bestScore:  this.storageManager.getBestScore(),
+    whitesTurn:      this.whitesTurn,
+    whiteScore:      this.whiteScore,
+    blackScore:      this.blackScore,
+    whiteWon:        this.whiteWon,
+    blackWon:        this.blackWon,
     terminated: this.isGameTerminated()
   });
 
@@ -104,9 +104,11 @@ GameManager.prototype.actuate = function () {
 GameManager.prototype.serialize = function () {
   return {
     grid:        this.grid.serialize(),
-    score:       this.score,
-    over:        this.over,
-    won:         this.won,
+    whitesTurn:         this.whitesTurn,
+    whiteScore:       this.whiteScore,
+    blackScore:       this.blackScore,
+    whiteWon:         this.whiteWon,
+    blackWon:         this.blackWon,
   };
 };
 
@@ -165,10 +167,20 @@ GameManager.prototype.move = function (direction) {
           tile.updatePosition(positions.next);
 
           // Update the score
-          self.score += merged.value;
+          if(self.whitesTurn){
+            self.whiteScore += merged.value;
+          } else {
+            self.blackScore += merged.value;
+          }
 
           // The mighty 2048 tile
-          if (merged.value === 2048) self.won = true;
+          if (merged.value === 2048){
+            if(self.whitesTurn){
+              self.whiteWon = true;
+            } else {
+              self.blackWon = true;
+            }
+          }
         } else if (next && ((next.value === '♚' && tile.value === '♔') || (next.value === '♔' && tile.value === '♚')) && !next.mergedFrom){
           var merged = new Tile(positions.next, tile.value);
           merged.mergedFrom = [tile, next];
@@ -180,8 +192,13 @@ GameManager.prototype.move = function (direction) {
           tile.updatePosition(positions.next);
 
           // Update the score
-          self.score += 5000;
-          self.won = true;
+          if(tile.value === '♔'){
+            self.whiteScore += 2048;
+            self.whiteWon = true;
+          } else {
+            self.blackScore += 2048;
+            self.blackWon = true;
+          }
         } else {
           self.moveTile(tile, positions.farthest);
         }
@@ -197,11 +214,17 @@ GameManager.prototype.move = function (direction) {
     this.addRandomTile();
 
     if (!this.movesAvailable()) {
-      this.over = true; // Game over!
+      if(whitesTurn){
+        this.blackWon = true; // White has no moves, Game over!
+      } else {
+        this.whiteWon = true; // Black has no moves, Game over!
+      }
     }
 
     this.actuate();
   }
+
+  this.whitesTurn = !this.whitesTurn;
 };
 
 // Get the vector representing the chosen direction
