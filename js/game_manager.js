@@ -4,8 +4,6 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.storageManager = new StorageManager;
   this.actuator       = new Actuator;
 
-  this.startTiles     = 5;
-
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
 
@@ -59,15 +57,14 @@ GameManager.prototype.setup = function () {
 // Set up the initial tiles to start the game with
 GameManager.prototype.addStartTiles = function () {
   // TODO: Decide the tile representation
-  var whitePiece = new Tile(this.grid.randomAvailableCell(), '♔');
-  //var whitePiece = new Tile(this.grid.randomAvailableCell(), '♔♕');
-  var blackPiece = new Tile(this.grid.randomAvailableCell(), '♚');
-  //var blackPiece = new Tile(this.grid.randomAvailableCell(), '♚♛');
+  var whitePiece = new Tile({x: 0, y: 0}, '♔');
+  var blackPiece = new Tile({x: 3, y: 3}, '♚');
+  var cornerOne = new Tile({x: 0, y: 3}, 2);
+  var cornerTwo = new Tile({x: 3, y: 0}, 2);
   this.grid.insertTile(whitePiece);
   this.grid.insertTile(blackPiece);
-  for (var i = 0; i < this.startTiles; i++) {
-    this.addRandomTile();
-  }
+  this.grid.insertTile(cornerOne);
+  this.grid.insertTile(cornerTwo);
 };
 
 // Adds a tile in a random position
