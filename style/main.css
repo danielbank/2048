@@ -22,6 +22,12 @@ h1.title {
   display: block;
   float: left; }
 
+.knight-logo {
+    vertical-align:middle;
+    height: 25%;
+    width: 25%;
+}
+
 @-webkit-keyframes move-up {
   0% {
     top: 25px;
